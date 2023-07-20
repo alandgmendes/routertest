@@ -18,6 +18,7 @@ const SigninPage: React.FC = () => {
       console.log(response);
       if (response === "ok") {
         // Redirect to another page on successful login
+        console.log('por hoje é só');
         console.log(response);
       } else {
         setError("Invalid email or password"); // Set error message
