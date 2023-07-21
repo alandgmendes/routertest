@@ -1,4 +1,6 @@
 import { useState } from "react";
+import CustomInput from "../components/CustomInput";
+import { Button } from "@mui/material";
 
 const SignUpPage = () => {
   const [nome, setNome] = useState("");
@@ -36,117 +38,95 @@ const SignUpPage = () => {
     <div>
       <h2>Registro:</h2>
       <form>
-        <div>
-          <label htmlFor="nome">Nome:</label>
-          <input
-            type="text"
-            id="nome"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="cpfCnpj">CPF/CNPJ:</label>
-          <input
-            type="text"
-            id="cpfCnpj"
-            value={cpfCnpj}
-            onChange={(e) => setCpfCnpj(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="telefone">Telefone:</label>
-          <input
-            type="text"
-            id="telefone"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="dataNascimento">Data de Nascimento:</label>
-          <input
-            type="date"
-            id="dataNascimento"
-            value={dataNascimento}
-            onChange={(e) => setDataNascimento(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="logradouro">Logradouro:</label>
-          <input
-            type="text"
-            id="logradouro"
-            value={logradouro}
-            onChange={(e) => setLogradouro(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="numero">Número:</label>
-          <input
-            type="text"
-            id="numero"
-            value={numero}
-            onChange={(e) => setNumero(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="bairro">Bairro:</label>
-          <input
-            type="text"
-            id="bairro"
-            value={bairro}
-            onChange={(e) => setBairro(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="cep">CEP:</label>
-          <input
-            type="text"
-            id="cep"
-            value={cep}
-            onChange={(e) => setCep(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="cidade">Cidade:</label>
-          <input
-            type="text"
-            id="cidade"
-            value={cidade}
-            onChange={(e) => setCidade(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="estado">Estado:</label>
-          <input
-            type="text"
-            id="estado"
-            value={estado}
-            onChange={(e) => setEstado(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="areaAtuacao">Área de Atuação:</label>
-          <input
-            type="text"
-            id="areaAtuacao"
-            value={areaAtuacao}
-            onChange={(e) => setAreaAtuacao(e.target.value)}
-          />
-        </div>
-        <button type="button" onClick={handleSignUp}>
+        <CustomInput
+          isIconActive={false}
+          label="Nome:"
+          placeholder="Seu nome..."
+          value={nome}
+          onChange={e => setNome(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="CPF/CNPJ:"
+          placeholder="Seu CPF/CNPJ..."
+          value={cpfCnpj}
+          onChange={e => setCpfCnpj(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Telefone:"
+          placeholder="Seu telefone..."
+          value={telefone}
+          onChange={e => setTelefone(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="__/__/__"
+          placeholder="__/__/__"
+          value={dataNascimento}
+          onChange={e => setDataNascimento(e.target.value)}
+          type="date"
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Email:"
+          placeholder="Seu email..."
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          type="email"
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Logradouro:"
+          placeholder="Seu logradouro..."
+          value={logradouro}
+          onChange={e => setLogradouro(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Número:"
+          placeholder="Seu número..."
+          value={numero}
+          onChange={e =>setNumero(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Bairro:"
+          placeholder="Seu bairro..."
+          value={bairro}
+          onChange={e =>setBairro(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="CEP:"
+          placeholder="Seu CEP..."
+          value={cep}
+          onChange={e => setCep(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Cidade:"
+          placeholder="Sua cidade..."
+          value={cidade}
+          onChange={e => setCidade(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Estado:"
+          placeholder="Seu estado..."
+          value={estado}
+          onChange={e => setEstado(e.target.value)}
+        />
+        <CustomInput
+          isIconActive={false}
+          label="Área de Atuação:"
+          placeholder="Sua área de atuação..."
+          value={areaAtuacao}
+          onChange={e => setAreaAtuacao(e.target.value)}
+        />
+        <Button onClick={handleSignUp}>
           Registrar
-        </button>
+        </Button>
       </form>
     </div>
   );
