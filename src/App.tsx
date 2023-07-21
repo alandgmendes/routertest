@@ -5,6 +5,7 @@ import TitleBox from "./components/TitleBox";
 import MainLayout from "./layouts/MainLayout";
 
 import QuestionPage from "./components/QuestionPage";
+import { Outlet } from "react-router-dom";
 
 //gitcheck
 const App: React.FC = () => {
@@ -23,8 +24,7 @@ const App: React.FC = () => {
       >
         {/* GRID SYSTEM */}
         <Grid container height="90vh">
-          <SigninPage />
-          <TitleBox />
+          <Outlet />
         </Grid>
         {/* GRID SYSTEM END */}
       </Box>

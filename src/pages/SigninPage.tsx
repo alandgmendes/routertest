@@ -16,7 +16,6 @@ const SigninPage: React.FC = () => {
     try {
       const response = await loginCall(email, password);
 
-      console.log('por hoje é só');
       console.log(response);
       if (response === "ok") {
         // Redirect to another page on successful login

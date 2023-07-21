@@ -1,10 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './index.css'
-import Root, { 
-  loader as rootLoader,
-  action as rootAction
- } from "./routes/root";
+import './index.css';
 import ErrorPage from "./error-page";
 import Contact, {
   loader as contactLoader,
@@ -19,6 +15,7 @@ import {
 } from "react-router-dom";
 import Index from './routes';
 import SigninPage from './pages/SigninPage';
+import SignUpPage from './pages/SignUpPage';
 import App from './App';
 
 const router = createBrowserRouter([
@@ -29,22 +26,15 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Index /> },
       {
-        path: "contacts/:contactId",
-        element: <Contact />,
-        loader: contactLoader,
+        path: "signup",
+        element: <SignUpPage />,
       },
       {
-        path: "contacts/:contactId/edit",
-        element: <EditContact />,
-        loader: contactLoader,
-        action: editAction,
+        path: "login",
+        element: <SigninPage />,
       },
-      {
-        path: "contacts/:contactId/destroy",
-        action: destroyAction,
-      },
-    ],
-  }
+    ],    
+  },
 ]);
 
 const rootElement = document.getElementById('root') as Element;
