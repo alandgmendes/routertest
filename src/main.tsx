@@ -2,9 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css';
 import ErrorPage from "./error-page";
-import Contact, {
-  loader as contactLoader,
-} from "./routes/contact";
 import EditContact, {
   action as editAction,
 } from "./routes/edit";
@@ -17,6 +14,7 @@ import Index from './routes';
 import SigninPage from './pages/SigninPage';
 import SignUpPage from './pages/SignUpPage';
 import App from './App';
+import Contact from './routes/pessoa';
 
 const router = createBrowserRouter([
   {
@@ -24,7 +22,6 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Index /> },
       {
         path: "signup",
         element: <SignUpPage />,
@@ -32,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <SigninPage />,
+      },
+      {
+        path: "usuarios/:userId",
+        element: <Contact />,
       },
     ],    
   },

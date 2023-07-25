@@ -4,22 +4,34 @@ import React, { useState, useCallback, ChangeEvent } from "react";
 import CustomInput from "../components/CustomInput";
 import { loginCall } from "../scripts/services/auth/login.services";
 import logo from '../assets/logo1.png';
+import { useNavigate } from "react-router-dom";
+import { Buffer } from "buffer";
 
 const SigninPage: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [isSignIn, setIsSignIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = async () => {
     try {
       const response = await loginCall(email, password);
+      
+      if (response.access_token) {
+        console.log(response.access_token);
+        const token = response.access_token;
+        const parts = token.split('.');
+        const encodedPayload = parts[1];
 
-      console.log(response);
-      if (response === "ok") {
-        // Redirect to another page on successful login
-        console.log(response);
+        const decodedPayload = atob(encodedPayload);
+        const payload = JSON.parse(decodedPayload);
+
+        console.log(payload);
+        setIsLoggedIn(true);
+        navigate("/usuarios/1");
       } else {
         setError("Invalid email or password"); // Set error message
       }

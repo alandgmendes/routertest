@@ -1,7 +1,7 @@
 import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
-import Contact from "./routes/contact";
+import Contact from "./routes/pessoa";
 
 export interface ContactInterface {
   id: string;

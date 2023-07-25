@@ -1,11 +1,27 @@
 import { useState } from "react";
-import CustomInput from "../components/CustomInput";
+import CustomInput from "../../components/CustomInput";
 import { Button } from "@mui/material";
-import { _Pessoa } from "./pessoas/PessoaModel";
+import { _Pessoa } from "./PessoaModel";
+import { validateCpf } from "../../utils/validators";
 
-const SignUpPage = () => {
+const RegistrarPessoa = () => {
+  const pessoa = {
+    nome:"",
+    cpf:"",
+    telefone:"",
+    dataNascimento:"",
+    email:"",
+    logradouro:"",
+    numero:"",
+    bairro:"",
+    cep:"",
+    cidade:"",
+    estado:"",
+    areaAtuacao:"",
+  }
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
+  const [ cpfValido, setCpfValido] = useState(false);
   const [telefone, setTelefone] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
   const [email, setEmail] = useState("");
@@ -17,22 +33,7 @@ const SignUpPage = () => {
   const [estado, setEstado] = useState("");
   const [areaAtuacao, setAreaAtuacao] = useState("");
 
-  const Pessoa = {
-    nome:'',
-    cpf:'',
-    telefone:'',
-    dataNascimento:'',
-    email:'',
-    logradouro:'',
-    numero:'',
-    bairro:'',
-    cep:'',
-    cidade:'',
-    estado:'',
-    areaAtuacao:'',
-  }
   const handleSignUp = () => {
-    
     // Perform sign-up logic here, e.g., making an API call to register the user
     console.log("Sign-up form data:", {
       nome,
@@ -148,4 +149,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default RegistrarPessoa;

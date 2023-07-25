@@ -1,19 +1,15 @@
 import { API_URL } from '../../../constants'
-export async function loginCall(email: string, senha: string) {
+export async function getPessoaByUserId(id: string) {
     const urlBase = API_URL; 
-    const url = `${urlBase}/auth/login`;
-    const data = {
-      email: email,
-      senha:  senha
-    };
+    const url = `${urlBase}/usuarios/${id}`;
+    
     if(url){
         try {
             const response = await fetch(url, {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
             });
         
             if (response) {
