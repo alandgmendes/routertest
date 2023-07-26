@@ -15,8 +15,7 @@ export async function getPessoaByUserId(id: string) {
             if (response) {
               const result = response.json();
               return result;
-            } else {
-              
+            } else {              
               return 'error';
             }
         } catch (error) {

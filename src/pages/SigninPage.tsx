@@ -6,8 +6,11 @@ import { loginCall } from "../scripts/services/auth/login.services";
 import logo from '../assets/logo1.png';
 import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
+import { useDispatch } from "react-redux";
+import { setUser } from "../auth/user.slice";
 
 const SigninPage: React.FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,17 +24,17 @@ const SigninPage: React.FC = () => {
       const response = await loginCall(email, password);
       
       if (response.access_token) {
-        console.log(response.access_token);
         const token = response.access_token;
         const parts = token.split('.');
         const encodedPayload = parts[1];
 
         const decodedPayload = atob(encodedPayload);
         const payload = JSON.parse(decodedPayload);
-
-        console.log(payload);
+        dispatch(setUser(payload));
         setIsLoggedIn(true);
-        navigate("/usuarios/1");
+        if (payload.pessoa === null){
+          navigate("/register-pessoa");
+        }
       } else {
         setError("Invalid email or password"); // Set error message
       }
@@ -96,6 +99,7 @@ const SigninPage: React.FC = () => {
               isIconActive={false}
               value={email}
               onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setEmail(e.target.value)}
+              isRequired={true}
             />
             <CustomInput
               label="Senha"

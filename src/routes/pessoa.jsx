@@ -8,12 +8,12 @@ import {
 import { getPessoaByUserId } from "../scripts/services/pessoa/pessoa.loader";
 
 
-export default function Contact() {
+export default function Pessoa() {
   let { userId } = useParams();
   const pessoa = getPessoaByUserId(userId);
   console.log(pessoa);
   return (
-    <div id="contact">
+    <div id="Pessoa">
       <h1>Pessoa</h1>
     </div>
   );

@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useState, useRef, ChangeEvent } from "react";
 import CustomInput from "../../components/CustomInput";
 import { Button } from "@mui/material";
 import { _Pessoa } from "./PessoaModel";
 import { validateCpf } from "../../utils/validators";
+import { getCep } from "../../utils/ViaCEP";
+import { useSelector } from "react-redux";
 
 const RegistrarPessoa = () => {
+  const user = useSelector((state) => state?.user?.user);
+  
+  console.log(user);
   const pessoa = {
     nome:"",
     cpf:"",
     telefone:"",
     dataNascimento:"",
-    email:"",
+    email:user.username,
     logradouro:"",
     numero:"",
     bairro:"",
@@ -20,20 +25,35 @@ const RegistrarPessoa = () => {
     areaAtuacao:"",
   }
   const [nome, setNome] = useState("");
+  const [isNomeValido, setIsNomeValido] = useState(false);
+
   const [cpf, setCpf] = useState("");
-  const [ cpfValido, setCpfValido] = useState(false);
+  const [cpfValido, setCpfValido] = useState(false);
+
   const [telefone, setTelefone] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
   const [email, setEmail] = useState("");
+
   const [logradouro, setLogradouro] = useState("");
+  const [logradouroIsValido, setLogradouroIsValido] = useState(false);
+
   const [numero, setNumero] = useState("");
+  const [numeroIsValido, setNumeroIsValido] = useState(false);
+
   const [bairro, setBairro] = useState("");
+  const [bairroIsValido, setBairroIsValido] = useState(false);
+
   const [cep, setCep] = useState("");
+  const [cepIsValido, setCepIsValido] = useState(false);
+
   const [cidade, setCidade] = useState("");
+  const [cidadeIsValido, setCidadeIsValido] = useState(false);
+
   const [estado, setEstado] = useState("");
-  const [areaAtuacao, setAreaAtuacao] = useState("");
+  const [estadoIsValido, setEstadoIsValido] = useState(false);
 
   const handleSignUp = () => {
+    pessoa.nome= nome;
     // Perform sign-up logic here, e.g., making an API call to register the user
     console.log("Sign-up form data:", {
       nome,
@@ -47,10 +67,108 @@ const RegistrarPessoa = () => {
       cep,
       cidade,
       estado,
-      areaAtuacao,
     });
   };
 
+  
+  const cpfInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCpfChange = (cpf: string) => {
+    if(cpf.length < 15){
+      const digitsOnly = cpf.replace(/\D/g, "");
+      setCpfValido(validateCpf(digitsOnly));
+      const cursorPosition = cpfInputRef.current?.selectionStart || 0;
+      const groups = [
+        digitsOnly.slice(0, 3),
+        digitsOnly.slice(3, 6),
+        digitsOnly.slice(6, 9),
+        digitsOnly.slice(9, 11),
+      ];
+      const maskedCPF = groups
+        .map((group, index) => {
+          if (index === groups.length - 1) {
+            return group;
+          }
+          return cursorPosition > group.length * index ? group : "";
+        })
+        .filter((group) => group !== "")
+        .join(".");
+      setCpf(maskedCPF);
+      if (cpfInputRef.current) {
+        cpfInputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      }
+    }    
+  };
+
+  const cepInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCepChange = async(cep: string) => {
+    if(cep.length < 10){
+      const digitsOnly = cep.replace(/\D/g, "");
+      if(cep.length === 9){
+        const enderecoComp = await getCep(digitsOnly);
+        setLogradouro(enderecoComp?.logradouro || "");
+        setLogradouroIsValido(true);
+        setBairro(enderecoComp?.bairro || "");
+        setBairroIsValido(true);
+        setCidade(enderecoComp?.localidade || "");
+        setCidadeIsValido(true);
+        setEstado(enderecoComp?.uf || "");
+        setEstadoIsValido(true);
+      }
+      const cursorPosition = cepInputRef.current?.selectionStart || 0;
+      let maskedCEP = "";
+      for (let i = 0; i < digitsOnly.length; i++) {
+        if (i === 5) {
+          maskedCEP += "-";
+        }
+        maskedCEP += digitsOnly[i];
+      }
+      setCep(maskedCEP);
+      if (cepInputRef.current) {
+        if (cursorPosition === 5) {
+          cepInputRef.current.setSelectionRange(6, 6);
+        } else {
+          cepInputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+        }
+      }    
+    }
+  };
+
+  const handleNomeChange =(nomeIn: string) =>{
+    if(nomeIn.length > 2){
+      setIsNomeValido(true);
+    }
+    if(nomeIn.length < 2){
+      setIsNomeValido(false);
+    }
+    setNome(nomeIn);
+  };
+
+  const telefoneInputRef = useRef<HTMLInputElement>(null);
+
+  const handleTelefoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const phoneInput = e.currentTarget.value;
+    let formattedPhone = phoneInput;
+    const digitsOnly = phoneInput.replace(/\D/g, "");
+    if (digitsOnly.length >= 2) {
+      formattedPhone = `(${digitsOnly.slice(0, 2)})`;
+  
+      if (digitsOnly.length > 2 && digitsOnly.length <= 7) {
+        formattedPhone += `${digitsOnly.slice(2, 7)}`;
+      } else if (digitsOnly.length > 7) {
+        formattedPhone += `${digitsOnly.slice(2, 7)}-${digitsOnly.slice(7, 12)}`;
+      }
+    }
+    setTelefone(formattedPhone);
+  
+    if (telefoneInputRef.current) {
+      const inputLength = formattedPhone.length;
+      telefoneInputRef.current.setSelectionRange(inputLength, inputLength);
+    }
+  };
+
+  
   return (
     <div>
       <h2>Registro:</h2>
@@ -60,21 +178,25 @@ const RegistrarPessoa = () => {
           label={_Pessoa.nome.label}
           placeholder="Seu nome..."
           value={nome}
-          onChange={e => setNome(e.target.value)}
+          onChange={e => handleNomeChange(e.currentTarget.value)}
+          name={_Pessoa.nome.Descricao}
+          isInValid={!isNomeValido}
         />
         <CustomInput
           isIconActive={false}
           label="CPF:"
           placeholder="Seu CPF..."
           value={cpf}
-          onChange={e => setCpf(e.target.value)}
+          isInValid={!cpfValido}
+          onChange={e => handleCpfChange(e.target.value)}
+          inputRef={cpfInputRef}
         />
         <CustomInput
           isIconActive={false}
           label="Telefone:"
           placeholder="Seu telefone..."
           value={telefone}
-          onChange={e => setTelefone(e.target.value)}
+          onChange={e => handleTelefoneChange(e)}
         />
         <CustomInput
           isIconActive={false}
@@ -118,7 +240,7 @@ const RegistrarPessoa = () => {
           label="CEP:"
           placeholder="Seu CEP..."
           value={cep}
-          onChange={e => setCep(e.target.value)}
+          onChange={e => handleCepChange(e.target.value)}
         />
         <CustomInput
           isIconActive={false}
@@ -133,13 +255,6 @@ const RegistrarPessoa = () => {
           placeholder="Seu estado..."
           value={estado}
           onChange={e => setEstado(e.target.value)}
-        />
-        <CustomInput
-          isIconActive={false}
-          label="Área de Atuação:"
-          placeholder="Sua área de atuação..."
-          value={areaAtuacao}
-          onChange={e => setAreaAtuacao(e.target.value)}
         />
         <Button onClick={handleSignUp}>
           Registrar

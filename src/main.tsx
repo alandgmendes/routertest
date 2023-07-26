@@ -1,5 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { Provider } from "react-redux";
+import store from "./store"; 
 import './index.css';
 import ErrorPage from "./error-page";
 import EditContact, {
@@ -14,7 +16,8 @@ import Index from './routes';
 import SigninPage from './pages/SigninPage';
 import SignUpPage from './pages/SignUpPage';
 import App from './App';
-import Contact from './routes/pessoa';
+import Pessoa from './routes/pessoa';
+import RegistrarPessoa from './pages/pessoas/PessoaRegister';
 
 const router = createBrowserRouter([
   {
@@ -31,8 +34,12 @@ const router = createBrowserRouter([
         element: <SigninPage />,
       },
       {
+        path: "register-pessoa",
+        element: <RegistrarPessoa />,
+      },
+      {
         path: "usuarios/:userId",
-        element: <Contact />,
+        element: <Pessoa />,
       },
     ],    
   },
@@ -41,6 +48,8 @@ const router = createBrowserRouter([
 const rootElement = document.getElementById('root') as Element;
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>,
 );
