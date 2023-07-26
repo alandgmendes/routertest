@@ -5,24 +5,25 @@ import { _Pessoa } from "./PessoaModel";
 import { validateCpf } from "../../utils/validators";
 import { getCep } from "../../utils/ViaCEP";
 import { useSelector } from "react-redux";
+import { registerPessoa } from "../../scripts/services/pessoa/pessoa.create";
 
 const RegistrarPessoa = () => {
-  const user = useSelector((state) => state?.user?.user);
-  
-  console.log(user);
+  const user = useSelector((state) => state?.user?.user);  
   const pessoa = {
     nome:"",
     cpf:"",
     telefone:"",
     dataNascimento:"",
     email:user.username,
-    logradouro:"",
-    numero:"",
-    bairro:"",
-    cep:"",
-    cidade:"",
-    estado:"",
-    areaAtuacao:"",
+    endereco: {
+      logradouro: "",
+      cep: "",
+      estado: "",
+      numero: "",
+      bairro: "",
+      cidade: "",
+    },
+    criadoEm: new Date(),
   }
   const [nome, setNome] = useState("");
   const [isNomeValido, setIsNomeValido] = useState(false);
@@ -52,22 +53,34 @@ const RegistrarPessoa = () => {
   const [estado, setEstado] = useState("");
   const [estadoIsValido, setEstadoIsValido] = useState(false);
 
-  const handleSignUp = () => {
-    pessoa.nome= nome;
+  const handleSignUp = async() => {
+    const removeNonAlphanumericChars = (input: string): string => {
+      const regex = /[^a-zA-Z0-9]/g;
+      const result = input.replace(regex, '');
+      return result;
+    };
+    pessoa.nome = nome;
+    pessoa.cpf = removeNonAlphanumericChars(cpf);
+    pessoa.telefone = removeNonAlphanumericChars(telefone);
+    pessoa.dataNascimento = dataNascimento;
+    pessoa.email = email;
+    pessoa.endereco.logradouro = logradouro;
+    pessoa.endereco.numero = numero;
+    pessoa.endereco.cep = cep;
+    pessoa.endereco.bairro = bairro;
+    pessoa.endereco.cidade = cidade;
+    pessoa.endereco.estado = estado;
+    pessoa.email = user.username;
+    pessoa.criadoEm = new Date();
+    debugger;
+    const creation = await registerPessoa(pessoa);
+    if(creation){
+      debugger;
+      console.log(creation);
+    }
+    debugger;
     // Perform sign-up logic here, e.g., making an API call to register the user
-    console.log("Sign-up form data:", {
-      nome,
-      cpf,
-      telefone,
-      dataNascimento,
-      email,
-      logradouro,
-      numero,
-      bairro,
-      cep,
-      cidade,
-      estado,
-    });
+    console.log(pessoa);
   };
 
   
@@ -115,6 +128,7 @@ const RegistrarPessoa = () => {
         setCidadeIsValido(true);
         setEstado(enderecoComp?.uf || "");
         setEstadoIsValido(true);
+        setCepIsValido(true);
       }
       const cursorPosition = cepInputRef.current?.selectionStart || 0;
       let maskedCEP = "";
@@ -171,7 +185,7 @@ const RegistrarPessoa = () => {
   
   return (
     <div>
-      <h2>Registro:</h2>
+      <h2 style={{color: 'white'}}>Registro:</h2>
       <form>
         <CustomInput
           isIconActive={false}
@@ -200,7 +214,7 @@ const RegistrarPessoa = () => {
         />
         <CustomInput
           isIconActive={false}
-          label="__/__/__"
+          label="Data de nasc."
           placeholder="__/__/__"
           value={dataNascimento}
           onChange={e => setDataNascimento(e.target.value)}
