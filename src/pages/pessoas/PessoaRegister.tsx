@@ -6,8 +6,13 @@ import { validateCpf } from "../../utils/validators";
 import { getCep } from "../../utils/ViaCEP";
 import { useSelector } from "react-redux";
 import { registerPessoa } from "../../scripts/services/pessoa/pessoa.create";
+import { useDispatch } from "react-redux";
+import { setPessoa } from "./pessoa.slice";
+import { useNavigate } from "react-router-dom";
 
-const RegistrarPessoa = () => {
+const PessoaRegister = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state?.user?.user);  
   const pessoa = {
     nome:"",
@@ -72,15 +77,11 @@ const RegistrarPessoa = () => {
     pessoa.endereco.estado = estado;
     pessoa.email = user.username;
     pessoa.criadoEm = new Date();
-    debugger;
-    const creation = await registerPessoa(pessoa);
-    if(creation){
-      debugger;
-      console.log(creation);
+    const pessoaReturn = await registerPessoa(pessoa);
+    if(pessoaReturn !== 'error'){
+      dispatch(setPessoa(pessoa));
+      navigate(`/usuarios/${pessoaReturn.email}`);
     }
-    debugger;
-    // Perform sign-up logic here, e.g., making an API call to register the user
-    console.log(pessoa);
   };
 
   
@@ -278,4 +279,4 @@ const RegistrarPessoa = () => {
   );
 };
 
-export default RegistrarPessoa;
+export default PessoaRegister;

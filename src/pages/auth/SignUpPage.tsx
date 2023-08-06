@@ -1,7 +1,7 @@
 import { useState } from "react";
-import CustomInput from "../components/CustomInput";
+import CustomInput from "../../components/CustomInput";
 import { Button } from "@mui/material";
-import { _Pessoa } from "./pessoas/PessoaModel";
+import { _Pessoa } from "../pessoas/PessoaModel";
 
 const SignUpPage = () => {
   const [nome, setNome] = useState("");

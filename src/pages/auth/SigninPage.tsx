@@ -1,13 +1,15 @@
 import { Box, Button, colors, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React, { useState, useCallback, ChangeEvent } from "react";
-import CustomInput from "../components/CustomInput";
-import { loginCall } from "../scripts/services/auth/login.services";
-import logo from '../assets/logo1.png';
+import CustomInput from "../../components/CustomInput";
+import { loginCall } from "../../scripts/services/auth/login.services";
+import logo from '../../assets/logo1.png';
 import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
 import { useDispatch } from "react-redux";
-import { setUser } from "../auth/user.slice";
+import { setUser } from "../../auth/user.slice";
+import { setPessoa } from "../pessoas/pessoa.slice";
+import { setToken } from "./login.slice";
 
 const SigninPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,6 +27,7 @@ const SigninPage: React.FC = () => {
       
       if (response.access_token) {
         const token = response.access_token;
+        dispatch(setToken(token));
         const parts = token.split('.');
         const encodedPayload = parts[1];
 
@@ -34,6 +37,9 @@ const SigninPage: React.FC = () => {
         setIsLoggedIn(true);
         if (payload.pessoa === null){
           navigate("/register-pessoa");
+        }else{
+          dispatch(setPessoa(payload?.pessoa));
+          navigate(`/usuarios/${payload?.pessoa?.email}`);
         }
       } else {
         setError("Invalid email or password"); // Set error message

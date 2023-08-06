@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import SigninPage from "./pages/SigninPage";
+import SigninPage from "./pages/auth/SigninPage";
 import TitleBox from "./components/TitleBox";
 import MainLayout from "./layouts/MainLayout";
 
