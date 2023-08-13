@@ -15,6 +15,7 @@ import PessoaHome from './pages/pessoas/PessoaHome';
 import MeusProjetos from './pages/projetos/MeusProjetos';
 import PessoaRegister from './pages/pessoas/PessoaRegister';
 import ProjetoCriar  from './pages/projetos/ProjetoCriar';
+import Projeto from './pages/projetos/Projeto';
 
 const router = createBrowserRouter([
   {
@@ -47,10 +48,13 @@ const router = createBrowserRouter([
         path: "usuarios/:userId/projetos/novo",
         element: <ProjetoCriar />,
       },
-
       {
         path: "usuarios/:userId/projetos/novo/:projetoId",
         element: <ProjetoCriar />,
+      },
+      {
+        path: "usuarios/:userId/projetos/:projetoId",
+        element: <Projeto />,
       },
     ],    
   },

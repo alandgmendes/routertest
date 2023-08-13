@@ -12,10 +12,11 @@ const MeusProjetos: React.FC = () => {
   const [ProjectTable, setProjectTable] = useState([{}]);
   const [projectsdata, setProjectsData] = useState([]);
   const token = useSelector((state) => state.token)
-    const navigate = useNavigate();
+  const navigate = useNavigate();
     const user = useSelector((state) => state?.user?.user);
-    const handleClickProjetos = (target: EventTarget) => {
-      console.log(target);
+    const handleClickProjetos = (e:  MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      const idProjeto = e.currentTarget.value;
+      navigate(`${idProjeto}`);
     }
     
     useEffect(() => {
@@ -28,6 +29,7 @@ const MeusProjetos: React.FC = () => {
               key={projeto._id} 
               id={projeto._id} 
               name={projeto._id} 
+              value={projeto._id}
               onClick={(e) => handleClickProjetos(e)} 
               variant="contained"
               fullWidth

@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { useState, ChangeEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState, ChangeEvent, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { registerProjeto } from "../../scripts/services/projetos/projeto.create";
@@ -8,10 +8,13 @@ import { Button } from "@mui/material";
 import CustomInput  from '../../components/CustomInput';
 import CustomTextArea from "../../components/CustomTextArea";
 import mongoose from 'mongoose';
+import { getProjetoData } from "../../scripts/services/projetos/projeto.data";
 export type TObjectId = mongoose.ObjectId;
 export const ObjectId = mongoose.Types.ObjectId;
 
-const ProjetoCriar: React.FC = () => {
+const Projeto: React.FC = () => {
+
+  const params = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
@@ -27,6 +30,7 @@ const ProjetoCriar: React.FC = () => {
   const [planoDivulgacao, setPlanoDivulgacao] = useState("");
   const [fontesPatrocinio, setFontesPatrocinio] = useState("");
   const [projetoData, setProjetoData] = useState({});
+  const [isProjetoSet, setIsProjetoSet] = useState(false);
   const [fieldEditing, setFieldEditing] = useState(0);
   const fields = [
     {
@@ -116,12 +120,12 @@ const ProjetoCriar: React.FC = () => {
       fontesPatrocinio,  
       userId,    
     };  
-    
     const projetoReturn = await registerProjeto(projetoData, token);
+    console.log(projetoReturn);
+
     if (projetoReturn != "error") {
-      //dispatch(setProjeto(projetoData));
-      navigate(-1);
-      console.log('noerror');
+      dispatch(setProjeto(projetoData));
+      navigate(`/projetos/${projetoReturn}`);
     }
   };
 
@@ -176,10 +180,6 @@ const ProjetoCriar: React.FC = () => {
       </div>
     );
   };
-
-  const getProject= () =>{
-    
-  }
   const buttonsFields = SwitchFieldsButtons();
   const RenderField = () => {
     const field = fields[fieldEditing]; 
@@ -196,14 +196,43 @@ const ProjetoCriar: React.FC = () => {
     );
   };
 
+  const getProjeto = async (projetoId: string) => {
+    try {
+      const dataProjeto = await getProjetoData(projetoId, token)
+      console.log(dataProjeto);
+      return dataProjeto;
+    } catch (error) {
+      console.error('Error fetching project data:', error);
+      return { error: 'An error occurred while retrieving project data' };
+    }
+  }
+
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      if (params?.projetoId) {
+        try {
+          const dataProjeto = await getProjetoData(params.projetoId, token);
+          setProjetoData(dataProjeto);
+          setIsProjetoSet(true);
+        } catch (error) {
+          console.error('Error fetching project data:', error);
+        }
+      }
+    };
+  
+    fetchProjectData();
+  }, [params?.projetoId, token]);
+
   const renderedField = RenderField();
   return (
     <div>
-      <h2 style={{ color: "white" }}>Registro do Projeto:</h2>
-        {renderedField}
-        {buttonsFields}
-      <Button onClick={handleCreate}>Registrar</Button>
+      {isProjetoSet == true && <div>
+        <h2 style={{ color: "white" }}>Projeto {projetoData?.project?.titulo}:</h2>
+          {renderedField}
+          {buttonsFields}
+        <Button onClick={handleCreate}>Registrar</Button>
+      </div>}
     </div>
   );
 }
-export default ProjetoCriar;
+export default Projeto;
