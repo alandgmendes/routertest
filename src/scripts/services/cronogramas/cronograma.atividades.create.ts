@@ -1,19 +1,19 @@
 import { API_URL } from '../../../constants';
 import mongoose from 'mongoose';
-import { CreateProjetoDto } from '../../../pages/projetos/create-projeto-dto';
 export type TObjectId = mongoose.ObjectId;
 export const ObjectId = mongoose.Types.ObjectId;
-export async function getProjetoData(projectId: string,  token: string) {
+export async function createCronogramaAtividades(cronogramaId: string,  token: string, data: any) {
     const urlBase = API_URL; 
-    const url = `${urlBase}/projeto/${projectId}`;
+    const url = `${urlBase}/atividades`;
     if(url){
         try {
             const response = await fetch(url, {
-            method: 'Get',
+            method: 'Post',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
+            body: JSON.stringify(data),
             });
             
             if (response) {
@@ -24,7 +24,7 @@ export async function getProjetoData(projectId: string,  token: string) {
             }
         } catch (error) {
             console.error('Error:', error);
-            return { error: 'Um erro ocorreu ao recuperar dados do projeto' };
+            return { error: 'Um erro ocorreu ao recuperar dados do cronograma' };
         }
     }
   }

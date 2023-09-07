@@ -1,24 +1,24 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { Button, Box, Grid, colors } from "@mui/material";
 import { useState, ChangeEvent, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { registerProjeto } from "../../scripts/services/projetos/projeto.create";
 import { setProjeto } from "./projeto.slice";
-import { Button } from "@mui/material";
-import CustomInput  from '../../components/CustomInput';
 import CustomTextArea from "../../components/CustomTextArea";
 import mongoose from 'mongoose';
 import { getProjetoData } from "../../scripts/services/projetos/projeto.data";
+import { getCronogramaByProjetoId } from "../../scripts/services/cronogramas/cronograma.projeto.loader";
 export type TObjectId = mongoose.ObjectId;
 export const ObjectId = mongoose.Types.ObjectId;
 
 const Projeto: React.FC = () => {
 
   const params = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.user);
-  const token = useSelector((state) => state.token)
+  const token = useSelector((state: { token: string }) => state.token);
+  const navigate = useNavigate();
+  const user = useSelector((state: any) => state?.user?.user);
   const [titulo, setTitulo] = useState("");
   const [resumoProjeto, setResumoProjeto] = useState("");
   const [descricaoProjeto, setDescricaoProjeto] = useState("");
@@ -32,6 +32,7 @@ const Projeto: React.FC = () => {
   const [projetoData, setProjetoData] = useState({});
   const [isProjetoSet, setIsProjetoSet] = useState(false);
   const [fieldEditing, setFieldEditing] = useState(0);
+  const [ cronograma, setCronograma] = useState({});
   const fields = [
     {
       name: "titulo",
@@ -121,13 +122,18 @@ const Projeto: React.FC = () => {
       userId,    
     };  
     const projetoReturn = await registerProjeto(projetoData, token);
-    console.log(projetoReturn);
 
     if (projetoReturn != "error") {
       dispatch(setProjeto(projetoData));
-      navigate(`/projetos/${projetoReturn}`);
+      navigate(`/projetos/${projetoReturn.projeto._id}`);
     }
   };
+
+  const handleClickCronograma = async(e: React.MouseEvent<HTMLButtonElement>) => {
+    const idProjeto = e.currentTarget.id;
+    const idCronograma = cronograma?._id; 
+    navigate(`/usuarios/${user.username}/projetos/${idProjeto}/cronograma/${idCronograma}`);
+  }
 
   const handleInputChange = (fieldName: string, value: string) => {
     switch (fieldName) {
@@ -196,30 +202,22 @@ const Projeto: React.FC = () => {
     );
   };
 
-  const getProjeto = async (projetoId: string) => {
-    try {
-      const dataProjeto = await getProjetoData(projetoId, token)
-      console.log(dataProjeto);
-      return dataProjeto;
-    } catch (error) {
-      console.error('Error fetching project data:', error);
-      return { error: 'An error occurred while retrieving project data' };
+
+  const fetchProjectData = async () => {
+    if (params?.projetoId) {
+      try {
+        const dataProjeto = await getProjetoData(params.projetoId, token);
+        const cronogramaResult = await getCronogramaByProjetoId(params.projetoId, token);
+        setCronograma(cronogramaResult);
+        setProjetoData(dataProjeto);
+        setIsProjetoSet(true);
+      } catch (error) {
+        console.error('Error fetching project data:', error);
+      }
     }
-  }
+  };
 
   useEffect(() => {
-    const fetchProjectData = async () => {
-      if (params?.projetoId) {
-        try {
-          const dataProjeto = await getProjetoData(params.projetoId, token);
-          setProjetoData(dataProjeto);
-          setIsProjetoSet(true);
-        } catch (error) {
-          console.error('Error fetching project data:', error);
-        }
-      }
-    };
-  
     fetchProjectData();
   }, [params?.projetoId, token]);
 
@@ -228,9 +226,16 @@ const Projeto: React.FC = () => {
     <div>
       {isProjetoSet == true && <div>
         <h2 style={{ color: "white" }}>Projeto {projetoData?.project?.titulo}:</h2>
+        {isProjetoSet && <Button 
+              variant="contained"
+              fullWidth
+              sx={{ mt: 4, boxShadow: `0 0 20px ${colors.green[500]}` }} id={projetoData?.project?._id} onClick={handleClickCronograma}>Ir para cronograma</Button>}
           {renderedField}
           {buttonsFields}
-        <Button onClick={handleCreate}>Registrar</Button>
+        <Button 
+              variant="contained"
+              fullWidth
+              sx={{ mt: 4, boxShadow: `0 0 20px ${colors.green[500]}` }} onClick={handleCreate}>Salvar Edição</Button>
       </div>}
     </div>
   );

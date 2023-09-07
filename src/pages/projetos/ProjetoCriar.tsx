@@ -119,9 +119,7 @@ const ProjetoCriar: React.FC = () => {
     
     const projetoReturn = await registerProjeto(projetoData, token);
     if (projetoReturn != "error") {
-      //dispatch(setProjeto(projetoData));
       navigate(-1);
-      console.log('noerror');
     }
   };
 

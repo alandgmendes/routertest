@@ -15,7 +15,8 @@ import PessoaHome from './pages/pessoas/PessoaHome';
 import MeusProjetos from './pages/projetos/MeusProjetos';
 import PessoaRegister from './pages/pessoas/PessoaRegister';
 import ProjetoCriar  from './pages/projetos/ProjetoCriar';
-import Projeto from './pages/projetos/Projeto';
+import Projeto from './pages/projetos/ProjetoPage';
+import Cronograma from './pages/projetos/cronogramas/cronograma';
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,11 @@ const router = createBrowserRouter([
       {
         path: "usuarios/:userId/projetos/:projetoId",
         element: <Projeto />,
+      },
+
+      {
+        path: "usuarios/:userId/projetos/:projetoId/cronograma/:cronogramaId",
+        element: <Cronograma />,
       },
     ],    
   },

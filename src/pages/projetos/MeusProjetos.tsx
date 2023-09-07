@@ -1,31 +1,41 @@
 import { useSelector } from "react-redux";
 import { Button, Box, Grid, colors } from "@mui/material";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquarePlus } from '@fortawesome/free-solid-svg-icons'
 import { getUserProjetos } from "../../scripts/services/projetos/user.projetos.loader";
+import IProjeto from "./projeto.interface";
+import { useDispatch } from "react-redux";
+import { setProjeto } from "./projeto.slice";
 
 const MeusProjetos: React.FC = () => {
+  const dispatch = useDispatch();
+  let projarray: SetStateAction<never[]> = [];
   const [isLoading, setIsLoading] = useState(true);
-  const [projectsArray, setProjectsArray] = useState([{}])
+  const [projectsArray, setProjectsArray] = useState([])
   const [ProjectTable, setProjectTable] = useState([{}]);
   const [projectsdata, setProjectsData] = useState([]);
-  const token = useSelector((state) => state.token)
+  const token = useSelector((state: any) => state?.token)
   const navigate = useNavigate();
-    const user = useSelector((state) => state?.user?.user);
-    const handleClickProjetos = (e:  MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      const idProjeto = e.currentTarget.value;
-      navigate(`${idProjeto}`);
-    }
+  const user = useSelector((state: any) => state?.user?.user);
+  const handleClickProjetos = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const idProjeto = e.currentTarget.value;
+    const pArray = projarray as IProjeto[];
+    const projeto = pArray.find((project: IProjeto) => project._id === idProjeto);
+    dispatch(setProjeto(projeto));
+    
+    navigate(`${idProjeto}`);
+  }
     
     useEffect(() => {
+      
       const fetchProjetosData = async (userId: string, strToken: string) => {
         try {
           const projData = await getUserProjetos(user.pessoa._id, strToken);
           if(projData){
-            setProjectsArray(projData.projetos);
-            const projects = projData.projetos.map((projeto) => <Button 
+            projarray = projData.projetos;
+            const projects = projData.projetos.map((projeto: IProjeto) => <Button 
               key={projeto._id} 
               id={projeto._id} 
               name={projeto._id} 
@@ -45,6 +55,7 @@ const MeusProjetos: React.FC = () => {
         }
       };  
       fetchProjetosData(user.username, token);
+      setProjectsArray(projarray);
     }, [user.email, token]);
     const handleCreateProjetos = async() =>{
         navigate(`/usuarios/${user.username}/projetos/novo`);
