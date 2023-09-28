@@ -135,6 +135,11 @@ const Projeto: React.FC = () => {
     navigate(`/usuarios/${user.username}/projetos/${idProjeto}/cronograma/${idCronograma}`);
   }
 
+  const handleClickOrcamento= async(e: React.MouseEvent<HTMLButtonElement>) => {
+    const idProjeto = e.currentTarget.id;
+    navigate(`/usuarios/${user.username}/projetos/${idProjeto}/orcamentocreate`);
+  }
+
   const handleInputChange = (fieldName: string, value: string) => {
     switch (fieldName) {
       case "titulo":
@@ -226,10 +231,14 @@ const Projeto: React.FC = () => {
     <div>
       {isProjetoSet == true && <div>
         <h2 style={{ color: "white" }}>Projeto {projetoData?.project?.titulo}:</h2>
-        {isProjetoSet && <Button 
+          {isProjetoSet && <Button 
               variant="contained"
               fullWidth
               sx={{ mt: 4, boxShadow: `0 0 20px ${colors.green[500]}` }} id={projetoData?.project?._id} onClick={handleClickCronograma}>Ir para cronograma</Button>}
+          {isProjetoSet && <Button 
+              variant="contained"
+              fullWidth
+              sx={{ mt: 4, boxShadow: `0 0 20px ${colors.green[500]}` }} id={projetoData?.project?._id} onClick={handleClickOrcamento}>Ir para orçamento</Button>}
           {renderedField}
           {buttonsFields}
         <Button 

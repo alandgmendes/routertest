@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import * as React from 'react';
 import { Button, Box, Grid, colors } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSquarePlus } from '@fortawesome/free-solid-svg-icons'
 import IProjeto  from '../projeto.interface';
@@ -21,6 +21,7 @@ import InputLabel from '@mui/material/InputLabel';
 import { TransitionProps } from '@mui/material/transitions';
 import { getCronogramaAtividades } from "../../../scripts/services/cronogramas/cronograma.atividades.loader";
 import { createCronogramaAtividades } from "../../../scripts/services/cronogramas/cronograma.atividades.create";
+import IAtividade from "./atividade.interface";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -33,10 +34,12 @@ const Transition = React.forwardRef(function Transition(
 
 const Cronograma: React.FC = () => {
   const params = useParams();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [projectsArray, setProjectsArray] = useState<{ pessoa: { _id: string } }[]>([]);
   const [ProjectTable, setProjectTable] = useState([{}]);
   const [projectsdata, setProjectsData] = useState<JSX.Element[]>([]);
+  const [tasksdata, setTasksData] = useState<JSX.Element[]>([]);
   const token = useSelector((state: { token: string }) => state.token);
   const navigate = useNavigate();
   const user = useSelector((state: any) => state?.user?.user);
@@ -49,9 +52,10 @@ const Cronograma: React.FC = () => {
   const [editingTaskDescricao, setEditingTaskDescricao] = useState('');
   const [editingTaskPeriodoInicial, setEditingTaskPeriodoInicial] = useState(1);
   const [editingTaskPeriodoFinal, setEditingTaskPeriodoFinal] = useState(2);
+  const [editingTaskId, setEditingTaskId] = useState('');
 
 
-  const taskEdited = {
+  let taskEdited = {
     atividade:'',
     descricaoAtividade:'',
     periodoInicial: 0,
@@ -60,21 +64,22 @@ const Cronograma: React.FC = () => {
     modificadaEm: '',
     acessadaEm: '',
     cronogramaId: '',
+    _id:''
   }
 
   const getAtividades = async(cronogramaId: string, token: string) =>{
     const atividadesLista = await getCronogramaAtividades(cronogramaId, token);
-    console.log(atividadesLista);
-    debugger;
+    return atividadesLista;
   }
 
-  //const handleSave
   const handleClickOpen = () => {
     setOpen(true);
+    handleIsEditing();
   };
 
   const handleClose = () => {
     setOpen(false);
+    handleIsEditing();
   };
 
   const handleIsEditing = () => {
@@ -98,7 +103,7 @@ const Cronograma: React.FC = () => {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async() => {
     const idCronograma = params.cronogramaId;
     if(idCronograma){
       taskEdited.atividade = editingTaskNome;
@@ -106,60 +111,70 @@ const Cronograma: React.FC = () => {
       taskEdited.periodoInicial = editingTaskPeriodoInicial;
       taskEdited.periodoFinal = editingTaskPeriodoFinal;
       taskEdited.cronogramaId = idCronograma;
-      console.log(taskEdited);
-      createCronogramaAtividades(idCronograma, token, taskEdited);
+      let atividadeCreated = await createCronogramaAtividades(token, taskEdited);
+      if(atividadeCreated){
+        taskEdited = {
+          atividade:'',
+          descricaoAtividade:'',
+          periodoInicial: 0,
+          periodoFinal: 0,
+          criadaEm: '',
+          modificadaEm: '',
+          acessadaEm: '',
+          cronogramaId: '',
+          _id:''
+        }
+        handleClose();
+        navigate(location.pathname);
+      }
     };
-    setIsEditingTask(false);
   }
 
   const handleClickProjetos = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const idProjeto = e.currentTarget.value;
-    navigate(`${idProjeto}`);
+    const idTask = e.currentTarget.value;
+    taskEdited._id = idTask;
+    setOpen(true);
   }
 
 
   useEffect(() => {
     const cronogramaId = params.cronogramaId;
-    if(cronogramaId){
-
-    const resAtividades = getAtividades(cronogramaId, token);
-    debugger;
-    }
-    //const resAtividades = getAtividades()
-    const fetchProjetosData = async (userId: string, strToken: string) => {
+    const fetchProjetosData = async (strToken: string) => {
       try {
-        const projData = await getUserProjetos(user.pessoa._id, strToken);
-        if (projData) {
-          setProjectsArray(projData.projetos);
-          const projects = projData.projetos.map((projeto: IProjeto) => (
-            <Button
-              key={projeto._id}
-              id={projeto._id}
-              name={projeto._id}
-              value={projeto._id}
-              onClick={(e) => handleClickProjetos(e)}
-              variant="contained"
-              fullWidth
-              sx={{ mt: 4, boxShadow: `0 0 20px ${colors.green[500]}` }}
-            >
-              <p>{projeto.titulo}</p>
-            </Button>            
-          ));
-          setProjectsData(projects);
-          setIsLoading(false);
-        }
+        if(cronogramaId){
+          const resAtividades = await  getAtividades(cronogramaId, token);
+          if (resAtividades) {
+            setProjectsArray(resAtividades.projetos);
+            const atividades = resAtividades.map((atividade: IAtividade) => (
+              <Button
+                key={atividade._id}
+                id={atividade._id}
+                name={atividade._id}
+                value={atividade._id}
+                onClick={(e) => handleClickProjetos(e)}
+                variant="contained"
+                fullWidth
+                sx={{ mt: 4, boxShadow: `0 0 20px ${colors.green[500]}` }}
+              >
+                <p>{atividade.atividade}</p>
+              </Button>            
+            ));
+            setTasksData(atividades);
+            setIsLoading(false);
+          }
+        }        
       } catch (error) {
-        console.error("Error fetching projetos data:", error);
+        console.error("Error fetching tasks data:", error);
       }
     };
     fetchProjetosData(user.username, token);
-  }, [user.email, token]);
+  }, [user.email, token, isEdittingTask]);
 
   return (
     <Grid
       container 
       justifyContent="center" 
-      alignItems="flex-end" 
+      alignItems="flex-start" 
       height="100vh" 
     >
       <Grid
@@ -174,6 +189,7 @@ const Cronograma: React.FC = () => {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
+          flexDirection: "column", 
         }}
       >
         <Box
@@ -184,14 +200,20 @@ const Cronograma: React.FC = () => {
             alignItems: "center",
             width: "100%",
             borderRadius: "30px", 
+            maxHeight: "100vh",  
+            overflowY: "auto",   
           }}
         >
           <div id="Cronograma">
-            <h1 style={{ color: '#FFFFFF', marginBottom: "100px" }}>
-              Cronograma
-            </h1>
-            <span style={{color: '#FFFFFF', fontSize: 30}}>Nova atividade:</span>
-            <FontAwesomeIcon  onClick={handleClickOpen} style={{color: 'Dodgerblue', float: 'right'}}icon={faSquarePlus} size="2xl" />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+              <h1 style={{ color: '#FFFFFF', marginTop: "20px", marginBottom: "60px" }}>
+                Cronograma
+              </h1>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+              <span style={{ color: '#FFFFFF', fontSize: 30 }}>Nova atividade:</span>
+              <FontAwesomeIcon  onClick={handleClickOpen} style={{ color: 'Dodgerblue' }} icon={faSquarePlus} size="2xl" />
+            </div>
+            </div>
             <Dialog
               open={open}
               TransitionComponent={Transition}
@@ -211,6 +233,7 @@ const Cronograma: React.FC = () => {
                 id="nomeTarefa"
                 label="Nome:"
                 type="text"
+                required
                 fullWidth
                 variant="standard"
                 value={editingTaskNome}
@@ -223,6 +246,7 @@ const Cronograma: React.FC = () => {
                 id="descricaoTarefa"
                 label="Descrição:"
                 type="text"
+                required
                 fullWidth
                 variant="standard"
                 value={editingTaskDescricao}
@@ -236,6 +260,7 @@ const Cronograma: React.FC = () => {
                 labelId="periodoInicial-label"
                 id="periodoInicial"
                 label="Período Inicial:"
+                required
                 value={editingTaskPeriodoInicial.toString()}
                 onChange={(e) => {
                   const newValue = parseInt(e.target.value);
@@ -259,6 +284,7 @@ const Cronograma: React.FC = () => {
                 labelId="periodoFinal-label"
                 id="periodoFinal"
                 label="Período Final:"
+                required
                 value={editingTaskPeriodoFinal.toString()}
                 onChange={(e) => setEditingTaskPeriodoFinal(parseInt(e.target.value))}
               >
@@ -288,14 +314,16 @@ const Cronograma: React.FC = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 width: "100%",
-                marginBottom: "100px",
-                marginTop: '200px',
+                marginBottom: "20px",
+                marginTop: '20px',
               }}
             >
               <hr />
-              {projectsdata != null && <>
-                {projectsdata}
-              </>}
+              {tasksdata != null && (
+                <div style={{ maxHeight: "50vh", overflowY: "auto" }}>
+                  {tasksdata}
+                </div>
+              )}
             </div>
           </div>
         </Box>

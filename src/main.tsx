@@ -17,6 +17,7 @@ import PessoaRegister from './pages/pessoas/PessoaRegister';
 import ProjetoCriar  from './pages/projetos/ProjetoCriar';
 import Projeto from './pages/projetos/ProjetoPage';
 import Cronograma from './pages/projetos/cronogramas/cronograma';
+import OrcamentoCreate from './pages/projetos/orcamentos/orcamento';
 
 const router = createBrowserRouter([
   {
@@ -57,7 +58,10 @@ const router = createBrowserRouter([
         path: "usuarios/:userId/projetos/:projetoId",
         element: <Projeto />,
       },
-
+      {
+        path: "usuarios/:userId/projetos/:projetoId/orcamentocreate",
+        element: <OrcamentoCreate />,
+      },
       {
         path: "usuarios/:userId/projetos/:projetoId/cronograma/:cronogramaId",
         element: <Cronograma />,

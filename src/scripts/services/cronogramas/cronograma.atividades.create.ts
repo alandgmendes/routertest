@@ -2,7 +2,7 @@ import { API_URL } from '../../../constants';
 import mongoose from 'mongoose';
 export type TObjectId = mongoose.ObjectId;
 export const ObjectId = mongoose.Types.ObjectId;
-export async function createCronogramaAtividades(cronogramaId: string,  token: string, data: any) {
+export async function createCronogramaAtividades(token: string, data: any) {
     const urlBase = API_URL; 
     const url = `${urlBase}/atividades`;
     if(url){
